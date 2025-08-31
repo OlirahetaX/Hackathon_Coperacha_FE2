@@ -89,9 +89,9 @@ export const getDashboard = (walletAddress: string) =>
     walletAddress: string;
     saldo: number;
     miembros: { address: string; nombre?: string; aporte?: number }[];
-    propuestas: any[];
-    topAportes: any[];
-    ultimasTx: any[];
+    propuestas: [];
+    topAportes: [];
+    ultimasTx: [];
   }>(`/wallets/${walletAddress}/dashboard`);
 
 // ==== Configuración ====

@@ -1,19 +1,25 @@
-// Debe importarse lo MÁS arriba posible (por ejemplo en layout.tsx)
-const originalError = console.error;
+// src/app/intercept-console-error.ts
+// Intercepta errores de runtime y promesas no manejadas
 
-function shouldIgnoreConsoleError(args: any[]): boolean {
-  const flat = args.map(String).join(" ").toLowerCase();
-  // Palabras clave que aparecen en el stack
-  return (
-    flat.includes("wallet popup has been closed") ||
-    flat.includes("failed to connect with auth provider") ||
-    flat.includes("error while connecting to connector: auth")
-  );
+type ErrorHandler = (ev: ErrorEvent) => void;
+type RejectionHandler = (ev: PromiseRejectionEvent) => void;
+
+const onError: ErrorHandler = (ev) => {
+  // tu lógica (log, enviar a backend, etc.)
+  // ev.message, ev.filename, ev.lineno, ev.colno, ev.error
+};
+
+const onUnhandledRejection: RejectionHandler = (ev) => {
+  // ev.reason suele ser Error | string | unknown
+  // Maneja con type-guard:
+  const reason =
+    ev.reason instanceof Error ? ev.reason.stack ?? ev.reason.message : String(ev.reason);
+  // tu lógica para reportar
+};
+
+if (typeof window !== "undefined") {
+  window.addEventListener("error", onError);
+  window.addEventListener("unhandledrejection", onUnhandledRejection);
 }
 
-// Monkey-patch leve
-// Si usas un "logger" propio, aplica el filtro ahí en lugar de tocar console.
-console.error = (...args: any[]) => {
-  if (shouldIgnoreConsoleError(args)) return;
-  originalError(...args);
-};
+export {};
